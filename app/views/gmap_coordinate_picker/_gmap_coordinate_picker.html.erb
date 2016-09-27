@@ -1,23 +1,14 @@
-<%= javascript_include_tag ("https://maps.googleapis.com/maps/api/js?key=#{api_key}&sensor=false") %>
+<%= javascript_include_tag ("http://maps.googleapis.com/maps/api/js?key=#{api_key}&sensor=false") %>
 <script type="text/javascript">
     var <%= map_handler%> = <%= map_handler%> || {};
-    var <%= map_handler%>Marker = <%= map_handler%>Marker || {};
 
     jQuery(function () {
         var marker = null;
-        var defaultPoint = null;
-        var center = null;
-
-         <% if lat_column_value &&  lng_column_value%>
-            defaultPoint = new google.maps.LatLng(<%= lat_column_value%>, <%=lng_column_value %>);
-        <% end %>
-        <% unless default_coordinates.empty?%>
-            center = new google.maps.LatLng(<%= default_coordinates[0]%>, <%=default_coordinates[1] %>);
-        <% end %>
+        var latlng = new google.maps.LatLng(<%= default_coordinates[0]%>, <%=default_coordinates[1] %>);
 
         var myOptions = {
             zoom: <%=zoom_level %>,
-            center: center,
+            center:latlng,
             mapTypeId:google.maps.MapTypeId.ROADMAP
         };
 
@@ -26,12 +17,33 @@
 
         <% if lat_column_value && lng_column_value%>
         marker = new google.maps.Marker({
-            position:defaultPoint,
+            position:new google.maps.LatLng(<%= lat_column_value%>,<%=lng_column_value %>),
             map:map
         });
-    <% end%>
+        <% end%>
 
-        <%= map_handler%>Marker = marker;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var latLng = new google.maps.LatLng(lat, lng);
+
+            map.setCenter(latLng);
+            if(marker) {
+                marker.setPosition(latLng);
+            } else {
+                marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map
+                });
+            }
+        }
 
         google.maps.event.addListener(map, 'click', function(e) {
             updateLocation(e.latLng);
@@ -46,7 +58,7 @@
                     map: map
                 });
             }
-            <%= map_handler%>Marker = marker;
+
             map.setCenter(location);
             jQuery("#<%= lat_dom_id%>").val(location.lat());
             jQuery("#<%=lng_dom_id %>").val(location.lng());
