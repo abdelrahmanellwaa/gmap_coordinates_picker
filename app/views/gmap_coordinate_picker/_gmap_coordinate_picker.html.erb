@@ -20,15 +20,14 @@
             position:new google.maps.LatLng(<%= lat_column_value%>,<%=lng_column_value %>),
             map:map
         });
-        <% end%>
-
-        if (navigator.geolocation) {
+        <% else%>
+            if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
+            } else {
             alert("Geolocation is not supported by this browser.");
-        }
-
-
+            } 
+        <% end%>
+    
         function showPosition(position) {
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
@@ -43,6 +42,9 @@
                     map: map
                 });
             }
+             map.setCenter(location);
+            jQuery("#<%= lat_dom_id%>").val(lat);
+            jQuery("#<%= lng_dom_id %>").val(lng);
         }
 
         google.maps.event.addListener(map, 'click', function(e) {
