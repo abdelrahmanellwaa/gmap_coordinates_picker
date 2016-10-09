@@ -4,8 +4,12 @@
 
     jQuery(function () {
         var marker = null;
+        var circle = null;
         var latlng = new google.maps.LatLng(<%= default_coordinates[0]%>, <%=default_coordinates[1] %>);
-
+        
+        var radiusSlider = document.getElementById("radius_slider");
+        var radiusField = document.getElementById("radius_field");
+        var radius = parseInt(radiusSlider.value)
         var myOptions = {
             zoom: <%=zoom_level %>,
             center:latlng,
@@ -15,11 +19,14 @@
         var map = new google.maps.Map(document.getElementById("<%=map_container%>"), myOptions);
         <%= map_handler%> = map;
 
+
+
         <% if lat_column_value && lng_column_value%>
         marker = new google.maps.Marker({
             position:new google.maps.LatLng(<%= lat_column_value%>,<%=lng_column_value %>),
             map:map
-        });
+        }); 
+            setCircle(new google.maps.LatLng(<%= lat_column_value%>,<%=lng_column_value %>), radius)
         <% else%>
             if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
@@ -27,7 +34,47 @@
             alert("Geolocation is not supported by this browser.");
             } 
         <% end%>
-    
+        
+        
+        radiusSlider.addEventListener("click", updateRadiusSlider);
+        radiusField.addEventListener("change", updateRadiusField);
+
+        function updateRadiusSlider() {
+            var value = parseInt(radiusSlider.value);
+            radiusField.value = value;
+            updateCircleRadius(value);
+        }
+        
+        function updateRadiusField() {
+            var value = parseInt(radiusField.value);
+            radiusSlider.value = value;
+            updateCircleRadius(value);
+        }
+
+        google.maps.event.addListener(map, 'click', function(e) {
+            updateLocation(e.latLng);
+        });
+
+        function setCircle(position, radius) {
+            if(circle) {
+                circle.setCenter(position);
+            } else {
+                circle = new google.maps.Circle({
+                    center: position,
+                    radius: radius,
+                    fillColor: "#ff69b4",
+                    fillOpacity: 0.5,
+                    strokeOpacity: 0.0,
+                    strokeWeight: 0,
+                    map: map
+                });
+            } 
+        }
+
+        function updateCircleRadius(radius) {
+            circle.setRadius(radius);
+        }
+
         function showPosition(position) {
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
@@ -42,14 +89,10 @@
                     map: map
                 });
             }
-             map.setCenter(location);
+            setCircle(new google.maps.LatLng(lat,lng), radius)
             jQuery("#<%= lat_dom_id%>").val(lat);
             jQuery("#<%= lng_dom_id %>").val(lng);
         }
-
-        google.maps.event.addListener(map, 'click', function(e) {
-            updateLocation(e.latLng);
-        });
 
         function updateLocation(location) {
             if(marker) {
@@ -62,14 +105,16 @@
             }
 
             map.setCenter(location);
+            setCircle(new google.maps.LatLng(location.lat(),location.lng()));
             jQuery("#<%= lat_dom_id%>").val(location.lat());
-            jQuery("#<%=lng_dom_id %>").val(location.lng());
+            jQuery("#<%= lng_dom_id%>").val(location.lng());
         }
 
     });
 </script>
 <div class="<%= map_container_class%>" id="<%=map_container%>" style="<%= "width:#{map_width};height:#{map_height}"%>">
 </div>
+
 <%= lat_field%>
 <%= lng_field%>
 

@@ -10,6 +10,7 @@ module GmapCoordinatesPicker #:nodoc
         lat_column = options[:lat_column] || options[:gmap_conf][:lat_column] ||  GmapCoordinatesPicker.config.lat_column
         lng_column = options[:lng_column] || options[:gmap_conf][:lng_column] || GmapCoordinatesPicker.config.lng_column
         default_coordinates = options[:default_coordinates] || GmapCoordinatesPicker.config.default_coordinates
+        radius = options[:radius] || GmapCoordinatesPicker.config.radius
         lat_column_value = options[:object].present? ? options[:object].send(lat_column) : default_coordinates[0]
         lng_column_value = options[:object].present? ? options[:object].send(lng_column) : default_coordinates[1]
         prefix = options[:object].present? ? options[:object].class.name.downcase : "gmap_coordinate_picker"
@@ -26,6 +27,7 @@ module GmapCoordinatesPicker #:nodoc
           :map_width => options[:map_width] || GmapCoordinatesPicker.config.map_width,
           :map_height => options[:map_height] || GmapCoordinatesPicker.config.map_height,
           :default_coordinates => options[:default_coordinates] || GmapCoordinatesPicker.config.default_coordinates,
+          :radius => options[:radius] || GmapCoordinatesPicker.config.radius
       }
 
       editable_map_locals = {

@@ -17,6 +17,7 @@ module GmapCoordinatesPicker
     config_accessor :lat_column
     config_accessor :lng_column
     config_accessor :default_coordinates
+    config_accessor :radius
     config_accessor :map_handler
     config_accessor :zoom_level
     config_accessor :map_container_class
@@ -28,6 +29,7 @@ module GmapCoordinatesPicker
     config.lat_column = :latitude
     config.lng_column = :longitude
     config.default_coordinates = [23.727666666, 90.410550] #Dhaka (my home town) center point :)
+    config.radius = 100 # in miles 
     config.map_handler = 'gMapObj'
     config.zoom_level = 10
     config.map_container_class = 'gmap_coordinate_picker_container'
