@@ -7,8 +7,8 @@
         var circle = null;
         var latlng = new google.maps.LatLng(<%= default_coordinates[0]%>, <%=default_coordinates[1] %>);
         
-        var radiusSlider = document.getElementById("radius_slider");
-        var radiusField = document.getElementById("radius_field");
+        var radiusSlider = <%=radius_slider_id %>;
+        var radiusField = <%=radius_field_id %>;
         var radius = parseInt(radiusSlider.value)
         var myOptions = {
             zoom: <%=zoom_level %>,
@@ -29,16 +29,18 @@
             setCircle(new google.maps.LatLng(<%= lat_column_value%>,<%=lng_column_value %>), radius);
             adjustZoomToRadius(radius);
         <% else%>
+        setMarkerAndCircle(<%= default_coordinates[0]%>, <%=default_coordinates[1] %>);
             if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
-            adjustZoomToRadius(radius);
             } else {
             alert("Geolocation is not supported by this browser.");
-            } 
+            }
+
+             
         <% end%>
         
         
-        radiusSlider.addEventListener("click", updateRadiusSlider);
+        radiusSlider.addEventListener("change", updateRadiusSlider);
         radiusField.addEventListener("change", updateRadiusField);
         google.maps.event.addListener(map, 'zoom_changed', setMapCenter);
         google.maps.event.addListener(map, 'click', function(e) {
@@ -96,7 +98,11 @@
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
             var latLng = new google.maps.LatLng(lat, lng);
+            setMarkerAndCircle(lat, lng);
+        }
 
+        function setMarkerAndCircle(lat, lng) {
+            latLng = new google.maps.LatLng(lat, lng);
             map.setCenter(latLng);
             if(marker) {
                 marker.setPosition(latLng);
@@ -107,6 +113,7 @@
                 });
             }
             setCircle(new google.maps.LatLng(lat,lng), radius)
+            adjustZoomToRadius(radius);
             jQuery("#<%= lat_dom_id%>").val(lat);
             jQuery("#<%= lng_dom_id %>").val(lng);
         }

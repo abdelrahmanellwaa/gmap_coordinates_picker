@@ -16,6 +16,9 @@ module GmapCoordinatesPicker #:nodoc
         prefix = options[:object].present? ? options[:object].class.name.downcase : "gmap_coordinate_picker"
         lat_dom_id = "#{prefix}_#{lat_column}"
         lng_dom_id = "#{prefix}_#{lng_column}"
+        radius_slider_id = options[:radius_slider_id]
+        radius_field_id = options[:radius_field_id]
+
       end
 
       default_locals = {
@@ -27,7 +30,9 @@ module GmapCoordinatesPicker #:nodoc
           :map_width => options[:map_width] || GmapCoordinatesPicker.config.map_width,
           :map_height => options[:map_height] || GmapCoordinatesPicker.config.map_height,
           :default_coordinates => options[:default_coordinates] || GmapCoordinatesPicker.config.default_coordinates,
-          :radius => options[:radius] || GmapCoordinatesPicker.config.radius
+          :radius => options[:radius] || GmapCoordinatesPicker.config.radius,
+          :radius_slider_id => options[:radius_slider_id],
+          :radius_field_id => options[:radius_field_id]
       }
 
       editable_map_locals = {
